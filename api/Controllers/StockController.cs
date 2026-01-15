@@ -20,15 +20,17 @@ namespace api.Controllers
             _httpClient = httpClient;
         }
 
+        
         [HttpGet("{symbol}")]
         [ProducesResponseType(typeof(List<Stock>), 200)]
 
         public async Task<IActionResult> GetStockData(string symbol)
         {
             var url = $"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=15m&range=1mo";
+           // _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
             //changing some code around to actually get the response status, so i go in with GetAsync before converting to stringAsync
-            var response = await _httpClient.GetAsync(url);
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
             {
