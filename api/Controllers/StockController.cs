@@ -27,9 +27,18 @@ namespace api.Controllers
         {
             var url = $"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=15m&range=1mo";
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+            //changing some code around to actually get the response status, so i go in with GetAsync before converting to stringAsync
+            var response = await _httpClient.GetAsync(url);
 
-            var response = await _httpClient.GetStringAsync(url);
-            var jsonData = JsonSerializer.Deserialize<JsonElement>(response);
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound(new { message = $"The stock symbol '{symbol}' was not found." });
+            }
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            var jsonData = JsonSerializer.Deserialize<JsonElement>(responseContent);
+            
+
 
             //After looking through the json data, I want to pull the important variables for the stock data.
             var result = jsonData.GetProperty("chart").GetProperty("result")[0];
